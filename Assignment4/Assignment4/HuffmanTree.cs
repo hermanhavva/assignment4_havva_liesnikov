@@ -5,10 +5,10 @@ using System.Collections;
 public class HuffmanTree
 {
 
-    private readonly List<HuffmanTreeNode> _totalNodes= new ();  // do not know if need this thing or not
+  //  private readonly List<HuffmanTreeNode> _totalNodes= new ();  // do not know if need this thing or not
     private MyPriorityQueue _priorityQueue = new();
     private Dictionary<string, HuffmanTreeNode> _childNodes = new();
-    public Dictionary<string, string> encodeTable { get; }
+    public Dictionary<string, string?> EncodeTable { get; } = new(); // key - string symbol, value - encoded symbol
 
 
 
@@ -28,17 +28,13 @@ public class HuffmanTree
 
     public void InitialiseTree(Dictionary<string, int> frequencyTable)  // get the last layer of nodes 
     {                                                                   // into list and into priorityQueue
-        //_priorityQueue = new MyPriorityQueue();
-        foreach (var pair in frequencyTable)
+        foreach (var pair in frequencyTable)  // get all the child nodes into priority queue 
         {
             var node = new HuffmanTreeNode(pair.Key, pair.Value);
-            _totalNodes?.Add(node);
             _childNodes[node.Data] = node; 
             _priorityQueue.Enqueue(new KeyValuePair<HuffmanTreeNode, int>(node, pair.Value));
         }
-
-        
-        while (!_priorityQueue.IsEmpty())
+        while (!_priorityQueue.IsEmpty())  // forming the tree
         {
             var pair = _priorityQueue.Dequeue();
             var curNode1 = pair.Key;
@@ -52,20 +48,15 @@ public class HuffmanTree
             
             var newNode = new HuffmanTreeNode(newData, frequency, curNode1, curNode2 );
             (newNode.LeftChild.Parent,  newNode.RightChild.Parent) = (newNode, newNode);  // both children have the same parent
-            _totalNodes?.Add(newNode);
+          //  _totalNodes?.Add(newNode);
             if (!_priorityQueue.IsEmpty())
                 _priorityQueue.Enqueue(new KeyValuePair<HuffmanTreeNode, int>(newNode,newNode.Frequency));
         }
-    }
-
-    public BitArray Encode(string strToEncode, Dictionary<string,int> frequencyTable)
-    {
-        if (_childNodes.Count < 1)
-            throw new Exception("the Tree is not initialised ");
-        StringBuilder encodedData = new();
-        foreach (var symbol in strToEncode)
+        
+        foreach (var symbol in frequencyTable.Keys)  // building the Encode table
         {
-            var childNode = _childNodes[symbol.ToString()];
+            StringBuilder encodedData = new();
+            var childNode = _childNodes[symbol];
             
             while (childNode.Parent != null)
             {
@@ -79,18 +70,38 @@ public class HuffmanTree
                 
                 childNode = curNode;
             }
+            EncodeTable.TryAdd(symbol, encodedData.ToString());
+        }
+    }
+
+    public BitArray Encode(string strToEncode, Dictionary<string,int> frequencyTable)
+    {
+        if (_childNodes.Count < 1)
+            throw new Exception("the Tree is not initialised ");
+        StringBuilder encodedData = new();
+        foreach (var symbol in strToEncode)
+        {
+            if (EncodeTable.TryGetValue(symbol.ToString(), out string? symbolCode))
+            {
+                encodedData.Append(symbolCode); 
+            }
         }
 
         var binaryString = encodedData.ToString();
         
-        BitArray bitArray = new BitArray(binaryString.Select(c => c == '1').ToArray());
+        BitArray bitArray = new BitArray(binaryString.Select(ch => ch == '1').ToArray());
         return bitArray;
     }
 
-    public string Decode(BitArray bitArray)
-    {
-        
-    }
+    // public string Decode(BitArray bitArray)
+    // {
+    //     foreach (bool bit in bitArray)
+    //     {
+    //         
+    //     }
+    //
+    //     return 
+    // }
     
     /*public void RemoveLast()
     {

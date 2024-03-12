@@ -2,7 +2,7 @@ namespace Assignment4;
 
 public class MyPriorityQueue
 {
-    private readonly List<KeyValuePair<Point, int>> _myHeap = new(); // наша куча з точками
+    private readonly List<KeyValuePair<HuffmanTreeNode, int>> _myHeap = new(); // наша куча з точками
     private int _index;
 
     public void Print()
@@ -89,14 +89,14 @@ public class MyPriorityQueue
         return leftChildIndex;
     }
 
-    public void Enqueue(KeyValuePair<Point, int> node)
+    public void Enqueue(KeyValuePair<HuffmanTreeNode, int> node)
     {
         _myHeap.Add(node);
         _index++;
         HeapifyUp();
     }
 
-    public KeyValuePair<Point, int> Dequeue()
+    public KeyValuePair<HuffmanTreeNode, int> Dequeue()
     {
         if (_index == 0)
         {

@@ -10,21 +10,7 @@ public class HuffmanTree
     private Dictionary<string, HuffmanTreeNode> _childNodes = new();
     public Dictionary<string, string?> EncodeTable { get; } = new(); // key - string symbol, value - encoded symbol
 
-
-
-
-    /*public override string ToString()
-    {
-        StringBuilder totalList = new(); // StringBuilder is faster than ordinary concatenation
-        var currentNode = _firstNode; // can be null
-        while (currentNode != null)
-        {
-            totalList.Append($"{currentNode.Pair} ");
-            currentNode = currentNode.Next;
-        }
-
-        return totalList.ToString();
-    }*/
+    
 
     public void InitialiseTree(Dictionary<string, int> frequencyTable)  // get the last layer of nodes 
     {                                                                   // into list and into priorityQueue
@@ -48,11 +34,16 @@ public class HuffmanTree
             
             var newNode = new HuffmanTreeNode(newData, frequency, curNode1, curNode2 );
             (newNode.LeftChild.Parent,  newNode.RightChild.Parent) = (newNode, newNode);  // both children have the same parent
-          //  _totalNodes?.Add(newNode);
+  
             if (!_priorityQueue.IsEmpty())
                 _priorityQueue.Enqueue(new KeyValuePair<HuffmanTreeNode, int>(newNode,newNode.Frequency));
         }
+        GetEncodeTable(frequencyTable);
         
+    }
+
+    private void GetEncodeTable(Dictionary<string, int> frequencyTable)
+    {
         foreach (var symbol in frequencyTable.Keys)  // building the Encode table
         {
             StringBuilder encodedData = new();
@@ -73,7 +64,6 @@ public class HuffmanTree
             EncodeTable.TryAdd(symbol, encodedData.ToString());
         }
     }
-
     public BitArray Encode(string strToEncode, Dictionary<string,int> frequencyTable)
     {
         if (_childNodes.Count < 1)
@@ -92,16 +82,7 @@ public class HuffmanTree
         BitArray bitArray = new BitArray(binaryString.Select(ch => ch == '1').ToArray());
         return bitArray;
     }
-
-    // public string Decode(BitArray bitArray)
-    // {
-    //     foreach (bool bit in bitArray)
-    //     {
-    //         
-    //     }
-    //
-    //     return 
-    // }
+    
     
     /*public void RemoveLast()
     {

@@ -2,8 +2,65 @@ namespace Assignment4;
 using System.Text;
 using System.Collections;
 
+
+
 public class HuffmanTree
 {
+    
+    public void SaveEncodedDataToFile(BitArray bitArray, string filePath)
+        {
+            byte[] bytes = new byte[(bitArray.Length - 1) / 8 + 1];
+            bitArray.CopyTo(bytes, 0);
+            
+            // Збереження байтів у файл
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                // Запис таблиці кодування
+                var encodeTableSerialized = SerializeEncodeTable();
+                var encodeTableBytes = Encoding.UTF8.GetBytes(encodeTableSerialized);
+                fileStream.Write(BitConverter.GetBytes(encodeTableBytes.Length), 0, sizeof(int));
+                fileStream.Write(encodeTableBytes, 0, encodeTableBytes.Length);
+
+                // Запис закодованих даних
+                fileStream.Write(bytes, 0, bytes.Length);
+            }
+        }
+
+        private string SerializeEncodeTable()
+        {
+            return string.Join(";", EncodeTable.Select(kv => $"{kv.Key}:{kv.Value}"));
+        }
+
+        // Метод для зчитування закодованих даних і таблиці кодування з файлу
+        public static (BitArray bitArray, Dictionary<string, string> encodeTable) ReadEncodedDataFromFile(string filePath)
+        {
+            byte[] encodeTableBytes;
+            byte[] encodedDataBytes;
+
+            using (var fileStream = new FileStream(filePath, FileMode.Open))
+            {
+                // Читання довжини таблиці кодування
+                byte[] encodeTableLengthBytes = new byte[sizeof(int)];
+                fileStream.Read(encodeTableLengthBytes, 0, sizeof(int));
+                int encodeTableLength = BitConverter.ToInt32(encodeTableLengthBytes, 0);
+
+                // Читання таблиці кодування
+                encodeTableBytes = new byte[encodeTableLength];
+                fileStream.Read(encodeTableBytes, 0, encodeTableLength);
+
+                // Читання закодованих даних
+                encodedDataBytes = new byte[fileStream.Length - fileStream.Position];
+                fileStream.Read(encodedDataBytes, 0, encodedDataBytes.Length);
+            }
+
+            var encodeTableString = Encoding.UTF8.GetString(encodeTableBytes);
+            var encodeTable = encodeTableString.Split(';').Select(part => part.Split(':')).ToDictionary(split => split[0], split => split[1]);
+
+            var bitArray = new BitArray(encodedDataBytes);
+
+            return (bitArray, encodeTable);
+        }
+    
     //  private readonly List<HuffmanTreeNode> _totalNodes= new ();  // do not know if need this thing or not
     private readonly MyPriorityQueue _priorityQueue = new();
     private readonly Dictionary<string, HuffmanTreeNode> _childNodes = new();

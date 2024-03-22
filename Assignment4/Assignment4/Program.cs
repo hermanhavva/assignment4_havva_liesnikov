@@ -2,16 +2,23 @@
 using System.Collections;
 using System.IO; // Для роботи з файлами
 
-var fileParser = new FileParser("/Users/evgen/RiderProjects/assignment4_havva_liesnikovv/sherlock.txt");
+var fileParser = new FileParser("C:\\C# projects\\assignment4_havva_liesnikov\\sherlock.txt");
 var frequencyTable = fileParser.GetFrequencyTable();
 
-foreach (var variable in frequencyTable)
+// foreach (var variable in frequencyTable)
+// {
+//     Console.WriteLine($"{variable.Key}, {variable.Value}");
+// }
+
+var tree = new HuffmanTree(frequencyTable);
+BitArray bitArray = tree.Encode(fileParser.StrText, frequencyTable);
+var encodingTable = tree.EncodeTable;
+Console.WriteLine("Getting Encoding Table");
+foreach (var variable in encodingTable)
 {
     Console.WriteLine($"{variable.Key}, {variable.Value}");
 }
 
-var tree = new HuffmanTree(frequencyTable);
-BitArray bitArray = tree.Encode(fileParser.StrText, frequencyTable);
 
 byte[] bytes = new byte[(bitArray.Length - 1) / 8 + 1]; 
 bitArray.CopyTo(bytes, 0);
@@ -19,7 +26,7 @@ bitArray.CopyTo(bytes, 0);
 // {
 //     Console.Write(bit ? "1" : "0");
 // }
-string outputPath = "/Users/evgen/RiderProjects/assignment4_havva_liesnikovv/sherlock_encoded.bin";
+string outputPath = "C:\\C# projects\\assignment4_havva_liesnikov\\sherlock_encoded.bin";
 File.WriteAllBytes(outputPath, bytes);
 Console.WriteLine($"Encoded data saved to {outputPath}");
 

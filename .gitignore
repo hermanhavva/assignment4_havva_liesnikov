@@ -512,3 +512,4 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/csharp,rider,dotnetcore,windows
 .idea/.idea.assignment4_havva_liesnikov.dir/.idea/indexLayout.xml
 *.xml
+sherlock_encoded.bin
